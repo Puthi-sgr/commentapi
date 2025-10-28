@@ -1,14 +1,23 @@
-# Use an official OpenJDK runtime as a parent image
-FROM openjdk:17-jdk-slim
-
-# Set the working directory in the container
+# ---------- build stage ----------
+FROM maven:3.9.8-eclipse-temurin-21 AS build
 WORKDIR /app
+COPY pom.xml .
+# pre-download deps (better caching)
+RUN mvn -q -e -DskipTests dependency:go-offline
+COPY src ./src
+RUN mvn -q -e -DskipTests clean package
 
-# Copy the JAR file into the container
-COPY target/commentapi-0-0.2-SNAPSHOT.jar app.jar
+# ---------- runtime stage ----------
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+# copy the fat jar built by Spring Boot
+COPY --from=build /app/target/*.jar /app/app.jar
 
-# Expose the port your app runs on
+# Render provides $PORT. Tell Spring to listen on it.
+ENV JAVA_OPTS="-Dserver.port=${PORT:-8080}"
+
+# (optional) faster startup & smaller memory footprint
+# ENV JAVA_TOOL_OPTIONS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0"
+
 EXPOSE 8080
-
-# Command to run the application
-ENTRYPOINT ["java", "-jar", "app.jar"]
+CMD ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
