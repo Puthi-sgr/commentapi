@@ -1,5 +1,6 @@
 package com.puthi.commentapi;
 
+import com.puthi.commentapi.dto.health.DbHealthResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -34,24 +35,33 @@ public class DBHealthController {
     }
 
     @GetMapping("/health/db")
-    public ResponseEntity<Map<String, Object>> dbHealth() {
-        Map<String, Object> body = new HashMap<>();
-        body.put("component", "database");
+    public ResponseEntity<DbHealthResponse> dbHealth() {
         long t0 = System.nanoTime();
         try (Connection conn = dataSource.getConnection()) {
             boolean valid = conn.isValid(2);
             long ms = (System.nanoTime() - t0) / 1_000_000;
-            body.put("status", valid ? "UP" : "DOWN");
-            body.put("latencyMs", ms);
             if (valid) {
-                body.put("databaseProduct", conn.getMetaData().getDatabaseProductName());
-                body.put("databaseVersion", conn.getMetaData().getDatabaseProductVersion());
+                return new ResponseEntity<>(
+                        new DbHealthResponse(
+                                "database",
+                                "UP",
+                                ms,
+                                conn.getMetaData().getDatabaseProductName(),
+                                conn.getMetaData().getDatabaseProductVersion(),
+                                null
+                        ),
+                        HttpStatus.OK
+                );
+            } else {
+                return new ResponseEntity<>(
+                        new DbHealthResponse("database", "DOWN", ms, null, null, null),
+                        HttpStatus.SERVICE_UNAVAILABLE
+                );
             }
-            return new ResponseEntity<>(body, valid ? HttpStatus.OK : HttpStatus.SERVICE_UNAVAILABLE);
         } catch (Exception e) {
-            body.put("status", "DOWN");
-            body.put("error", e.getClass().getSimpleName() + ": " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(body);
+            long ms = (System.nanoTime() - t0) / 1_000_000;
+            return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+                    .body(new DbHealthResponse("database", "DOWN", ms, null, null, e.getClass().getSimpleName() + ": " + e.getMessage()));
         }
     }
 }
