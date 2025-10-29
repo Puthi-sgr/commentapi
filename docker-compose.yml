@@ -1,0 +1,17 @@
+# docker-compose.yml
+services:
+  db:
+    image: postgres:15
+    container_name: comments
+    restart: always
+    environment:
+      - POSTGRES_USER=app
+      - POSTGRES_PASSWORD=secretcommentapipass
+      - POSTGRES_DB=commentapi
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata_comments:/var/lib/postgresql/data
+
+volumes:
+  pgdata_comments:
