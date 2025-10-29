@@ -18,6 +18,9 @@ target/
 *.iws
 *.iml
 *.ipr
+### Resource db migration ###
+src/main/resources/db/migration/*.sql
+src/main/resources/db/changelog/*.xml
 
 ### NetBeans ###
 /nbproject/private/
