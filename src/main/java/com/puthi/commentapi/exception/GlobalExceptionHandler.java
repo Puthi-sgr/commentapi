@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.time.Instant;
 import java.util.List;
@@ -50,6 +51,23 @@ public class GlobalExceptionHandler {
                 correlationId(req),
                 Instant.now(),
                 items
+        );
+        return ResponseEntity.status(status).body(body);
+    }
+
+    @ExceptionHandler(NoHandlerFoundException.class)
+    public ResponseEntity<ProblemResponse> handleNotFound(NoHandlerFoundException ex, HttpServletRequest req) {
+        HttpStatus status = HttpStatus.NOT_FOUND;
+        ProblemResponse body = new ProblemResponse(
+                "https://errors.puthi.com/not-found",
+                "Not Found",
+                status.value(),
+                "No handler for " + ex.getHttpMethod() + " " + ex.getRequestURL(),
+                req.getRequestURI(),
+                "NOT_FOUND",
+                correlationId(req),
+                Instant.now(),
+                null
         );
         return ResponseEntity.status(status).body(body);
     }
