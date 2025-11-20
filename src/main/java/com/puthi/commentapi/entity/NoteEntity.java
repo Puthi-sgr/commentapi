@@ -1,6 +1,8 @@
 package com.puthi.commentapi.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+
 import java.time.Instant;
 
 //Entity uses the application properties with db creds in order access the databse
@@ -12,11 +14,21 @@ public class NoteEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false) private String title;
-    @Column(nullable = true, length = 255) private String content;
-    @Column(name="owner_id", nullable = false) private Long ownerId;
-    @Column(name="created_at", nullable = false) private Instant createdAt = Instant.now(); //When the note was created insert date now
-    @Column(name="updated_at", nullable = false) private Instant updatedAt = Instant.now();
+    @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = true, length = 255)
+    private String content;
+
+    @Column(name = "owner_id", nullable = false)
+    private Long ownerId;
+
+    @Column(name = "created_at", nullable = false)
+    private Instant createdAt = Instant.now(); //When the note was created insert date now
+
+    @Column(name = "updated_at", nullable = false)
+    private Instant updatedAt = Instant.now();
+
 
     @PreUpdate void onUpdate(){
         this.updatedAt = Instant.now(); //When updated, set the updated at to now
@@ -25,6 +37,7 @@ public class NoteEntity {
     //getters and setters
     public Long getId(){
         return id;
+
     }
     public void setId(Long id){
         this.id = id;

@@ -1,7 +1,6 @@
 package com.puthi.commentapi.service;
 
-import com.puthi.commentapi.dto.NoteCreateDto;
-import com.puthi.commentapi.dto.NoteResponseDto;
+import com.puthi.commentapi.dto.note.NoteCreateDto;
 import com.puthi.commentapi.repository.NoteRepository;
 import com.puthi.commentapi.entity.NoteEntity;
 

@@ -22,18 +22,6 @@ public class DBHealthController {
         this.dataSource = dataSource;
     }
 
-    @GetMapping(value = "/hello", produces = "application/json")
-    public ResponseEntity<Map<String, String>> hello() {
-        Map<String, String> body = new LinkedHashMap<>();
-        body.put("name", "Puthi");
-        body.put("age", "12");
-        body.put("city", "Chennai");
-        body.put("country", "India");
-        body.put("message", "Hello, World!"); // last by insertion order
-
-        return ResponseEntity.ok(body);
-    }
-
     @GetMapping("/health/db")
     public ResponseEntity<DbHealthResponse> dbHealth() {
         long t0 = System.nanoTime();

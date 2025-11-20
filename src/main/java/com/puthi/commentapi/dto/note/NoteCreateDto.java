@@ -1,4 +1,4 @@
-package com.puthi.commentapi.dto;
+package com.puthi.commentapi.dto.note;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
